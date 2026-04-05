@@ -10,7 +10,7 @@ function getClient() {
 }
 
 export async function generateDigest(articleBody) {
-  const model = getClient().getGenerativeModel({ model: 'gemini-2.5-flash-preview-04-17' });
+  const model = getClient().getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   const prompt = `You are a news editor creating a 60-second briefing for a busy software engineer.
 
@@ -40,7 +40,7 @@ Respond in this exact JSON format:
 }
 
 export async function answerQuestion({ articleBody, question }) {
-  const model = getClient().getGenerativeModel({ model: 'gemini-2.5-flash-preview-04-17' });
+  const model = getClient().getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   const prompt = `You are answering a question about a specific news article. Answer only from the content of the article. If the answer is not in the article, say so honestly — do not speculate or use outside knowledge.
 
@@ -54,3 +54,4 @@ Give a direct, concise answer in 2–4 sentences. No preamble.`;
   const result = await model.generateContent(prompt);
   return result.response.text().trim();
 }
+  
