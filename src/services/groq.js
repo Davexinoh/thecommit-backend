@@ -16,29 +16,22 @@ export async function generateArticle({ topic, sources }) {
     .map((s, i) => `[${i + 1}] "${s.title}" — ${s.url} (${s.points} points on HN)`)
     .join('\n');
 
-  const prompt = `You are a senior technology journalist writing for a publication read by software engineers, indie founders, and builders. Your writing is clear, informed, and never hype-driven. You cite sources honestly and surface what actually matters to people who ship software.
+  const prompt = `You are a senior technology journalist. Write a news article as a single valid JSON object. Do not include any text outside the JSON.
 
-Write a full news article about the following topic: "${topic}"
+Topic: "${topic}"
 
-Use these Hacker News stories as your primary source material:
+Source material from Hacker News:
 ${sourceSummary}
 
-REQUIREMENTS:
-- Headline: Sharp, specific, not clickbait. No colons unless truly necessary.
-- Subheadline: One sentence that adds context the headline can't.
-- Body: 550–650 words. 4–6 paragraphs. Opening paragraph establishes the core news in two sentences. Middle paragraphs add context, technical detail, and why this matters to builders. Closing paragraph gives a forward-looking take — what this means for the ecosystem.
-- Tone: Informed, direct, no adjective inflation. Treat the reader as a smart peer.
-- Do NOT fabricate quotes. Do NOT invent statistics not in source material.
-- End with a "Sources" section listing the HN links used.
+Rules:
+- headline: sharp, specific, no clickbait
+- subheadline: one sentence of additional context
+- body: 4 paragraphs separated by \\n\\n. Each paragraph is 2-3 sentences. Total 400-500 words. No fabricated quotes or statistics. Include sources at the end as a plain text list.
+- category: exactly one of: Tools, Funding, Open Source, AI, Community, SaaS
+- read_time_minutes: integer between 2 and 5
 
-Respond in this exact JSON format:
-{
-  "headline": "...",
-  "subheadline": "...",
-  "body": "...",
-  "category": "one of: Tools, Funding, Open Source, AI, Community, SaaS",
-  "read_time_minutes": <integer>
-}`;
+Respond with only this JSON, no markdown, no explanation:
+{"headline":"...","subheadline":"...","body":"...","category":"...","read_time_minutes":3}`;
 
   const completion = await client.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
