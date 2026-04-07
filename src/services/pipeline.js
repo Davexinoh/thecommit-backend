@@ -1,5 +1,6 @@
 import { getBuilderTrends } from './virlo.js';
 import { searchHN } from './hackernews.js';
+import { searchExa } from './exa.js';
 import { generateArticle } from './groq.js';
 import { generateDigest } from './gemini.js';
 import { fetchCoverImage } from './pexels.js';
@@ -42,10 +43,18 @@ export async function runPipeline() {
           continue;
         }
 
-        // Step 3: Fetch HN source stories
-        const sources = await searchHN(trend.name, 3);
+        // Step 3: Fetch source stories — Exa primary, HN fallback
+        let sources = [];
+        if (process.env.EXA_API_KEY) {
+          console.log(`[pipeline] Fetching sources via Exa for "${trend.name}"`);
+          sources = await searchExa(trend.name, 4);
+        }
+        if (sources.length < 2) {
+          console.log(`[pipeline] Exa returned ${sources.length} results, falling back to HN`);
+          sources = await searchHN(trend.name, 3);
+        }
         if (sources.length === 0) {
-          console.log(`[pipeline] No HN sources found for "${trend.name}", skipping`);
+          console.log(`[pipeline] No sources found for "${trend.name}", skipping`);
           continue;
         }
 
